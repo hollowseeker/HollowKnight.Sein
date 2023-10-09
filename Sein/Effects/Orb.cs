@@ -20,7 +20,7 @@ internal class Orb : MonoBehaviour
         orb.AddComponent<Orb>();
         orb.transform.localScale = new(SCALE, SCALE, 1);
 
-        // TODO: Scaling
+        // TODO: Animation
         var sr = orb.AddComponent<SpriteRenderer>();
         sr.sprite = SeinSprite.Value;
     }
