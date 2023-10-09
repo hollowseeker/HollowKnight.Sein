@@ -26,14 +26,14 @@ internal class Orb : MonoBehaviour
     }
 
     private static float SCALE = 0.6f;
-    private static float ACCEL = 20f;
+    private static float ACCEL = 16f;
     private static float MAX_SPEED = 60f;
-    private static float MAX_IDLE_VELOCITY = 4f;
+    private static float MAX_IDLE_VELOCITY = 5f;
     private static float Y_OFFSET = 0.4f;
     private static float Y_RANGE = 0.15f;
-    private static float Y_PERIOD = 1.2f;
-    private static float X_RANGE = 0.65f;
-    private static float X_PERIOD = 2.85f;
+    private static float Y_PERIOD = 1.25f;
+    private static float X_RANGE = 0.85f;
+    private static float X_PERIOD = 3.15f;
     private static Vector3 TARGET_SIZE => new(X_RANGE * 2, Y_RANGE * 2, 1);
     private static float MAX_BRAKE_DISTANCE = MAX_SPEED * MAX_SPEED / (2 * ACCEL);
 
