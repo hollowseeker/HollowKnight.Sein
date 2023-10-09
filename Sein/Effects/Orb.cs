@@ -1,7 +1,7 @@
 ﻿using ItemChanger;
 using UnityEngine;
 
-namespace Sein;
+namespace Sein.Effects;
 
 internal class Orb : MonoBehaviour
 {

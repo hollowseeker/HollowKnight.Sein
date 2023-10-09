@@ -1,5 +1,6 @@
 using Modding;
 using PurenailCore.ModUtil;
+using Sein.Effects;
 using System;
 
 namespace Sein

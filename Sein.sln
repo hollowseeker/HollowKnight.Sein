@@ -12,11 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sein", "Sein\Sein.csproj", "{83B55C2F-EEB6-4506-A12F-FF0F8551B3D8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ori", "Ori", "{29A90C61-B19A-4DE7-B08C-3F97BE56F402}"
-	ProjectSection(SolutionItems) = preProject
-		replace.txt = replace.txt
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataUpdater", "DataUpdater\DataUpdater.csproj", "{01C384F9-5DE9-4689-91B0-B7CA38AA5F3D}"
 EndProject
 Global
@@ -39,7 +34,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{83B55C2F-EEB6-4506-A12F-FF0F8551B3D8} = {549D5518-8BDA-4D15-8D24-7936523E44A6}
-		{29A90C61-B19A-4DE7-B08C-3F97BE56F402} = {549D5518-8BDA-4D15-8D24-7936523E44A6}
 		{01C384F9-5DE9-4689-91B0-B7CA38AA5F3D} = {549D5518-8BDA-4D15-8D24-7936523E44A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
