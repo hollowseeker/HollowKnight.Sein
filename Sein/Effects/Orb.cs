@@ -1,5 +1,4 @@
-﻿using ItemChanger;
-using Sein.Util;
+﻿using Sein.Util;
 using UnityEngine;
 
 namespace Sein.Effects;
