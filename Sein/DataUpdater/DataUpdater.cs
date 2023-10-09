@@ -8,7 +8,7 @@ public class DataUpdater
     {
         string modPath = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hollow Knight\\hollow_knight_Data\\Managed\\Mods\\Custom Knight\\Skins\\Ori";
         DirectoryInfo modDir = new(modPath);
-        if (modDir.Exists) modDir.Delete();
+        if (modDir.Exists) modDir.Delete(true);
         modDir.Create();
 
         var root = InferGitRoot(Directory.GetCurrentDirectory());
