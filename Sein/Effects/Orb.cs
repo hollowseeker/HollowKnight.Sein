@@ -26,7 +26,7 @@ internal class Orb : MonoBehaviour
     }
 
     private static float SCALE = 0.6f;
-    private static float Z = 0.1f;
+    private static float Z = -0.01f;
     private static float ACCEL = 21f;
     private static float MAX_SPEED = 60f;
     private static float MAX_IDLE_VELOCITY = 5f;
