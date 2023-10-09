@@ -1,4 +1,5 @@
 ﻿using ItemChanger;
+using Sein.Util;
 using UnityEngine;
 
 namespace Sein.Effects;
@@ -7,14 +8,14 @@ internal class Orb : MonoBehaviour
 {
     public static void Hook()
     {
-        Events.OnSceneChange += _ => InstantiateOrb();
+        SceneHooks.Hook(InstantiateOrb);
     }
 
     private static IC.EmbeddedSprite SeinSprite = new("Sein");
 
-    private static void InstantiateOrb()
+    private static void InstantiateOrb(bool oriEnabled)
     {
-        if (!SeinMod.OriActive()) return;
+        if (!oriEnabled) return;
 
         GameObject orb = new("SeinOrb");
         orb.AddComponent<Orb>();
@@ -26,6 +27,7 @@ internal class Orb : MonoBehaviour
     }
 
     private static float SCALE = 0.6f;
+    private static float Z = 0.1f;
     private static float ACCEL = 21f;
     private static float MAX_SPEED = 60f;
     private static float MAX_IDLE_VELOCITY = 5f;
@@ -34,19 +36,21 @@ internal class Orb : MonoBehaviour
     private static float Y_PERIOD = 1.25f;
     private static float X_RANGE = 0.85f;
     private static float X_PERIOD = 3.15f;
-    private static Vector3 TARGET_SIZE => new(X_RANGE * 2, Y_RANGE * 2, 1);
+    private static Vector3 TARGET_SIZE => new(X_RANGE * 2, Y_RANGE * 2, 2 * Z);
     private static float MAX_BRAKE_DISTANCE = MAX_SPEED * MAX_SPEED / (2 * ACCEL);
 
     private HeroController controller;
     private GameObject knight;
 
-    private Vector3 KnightPos => knight.transform.position;
-
-    private Vector3 TargetPos => KnightPos + new Vector3(0, Y_OFFSET, 0);
-
     protected void Awake()
     {
+        controller = GOFinder.HeroController();
+        knight = controller.gameObject;
     }
+
+    private Vector3 KnightPos => knight.transform.position;
+
+    private Vector3 TargetPos => KnightPos + new Vector3(0, Y_OFFSET, Z);
 
     private float xTimer = 0;
     private float yTimer = 0;
@@ -62,7 +66,7 @@ internal class Orb : MonoBehaviour
         var center = TargetPos;
         var newX = center.x + X_RANGE * Mathf.Sin(2 * xTimer * Mathf.PI / X_PERIOD);
         var newY = center.y + Y_RANGE * Mathf.Cos(2 * yTimer * Mathf.PI / Y_PERIOD);
-        Vector3 newTarget = new(newX, newY, 0);
+        Vector3 newTarget = new(newX, newY, Z);
 
         var diff = newTarget - prevTarget;
         if (diff.sqrMagnitude > MAX_IDLE_VELOCITY * MAX_IDLE_VELOCITY)
@@ -108,22 +112,17 @@ internal class Orb : MonoBehaviour
         prevVelocity = newVelocity;
     }
 
-    private bool Init()
-    {
-        if (controller != null) return true;
-
-        controller = GameManager.instance.hero_ctrl;
-        if (controller == null) return false;
-
-        knight = controller.gameObject;
-        prevTarget = KnightPos;
-        transform.position = TargetPos;
-        return true;
-    }
+    private static int WAIT_FRAMES = 2;
+    private int waited = 0;
 
     protected void Update()
     {
-        if (!Init()) return;
+        if (++waited <= WAIT_FRAMES) return;
+        if (waited == WAIT_FRAMES + 1)
+        {
+            prevTarget = KnightPos;
+            transform.position = TargetPos;
+        }
 
         var newTarget = ComputeNewTarget();
         AccelerateTo(newTarget);
