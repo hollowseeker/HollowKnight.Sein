@@ -7,5 +7,7 @@ namespace Sein.Util
         public static GameObject Knight() => GameManager.instance?.hero_ctrl?.gameObject ?? GameObject.Find("Knight");
 
         public static HeroController HeroController() => GameManager.instance?.hero_ctrl ?? GameObject.Find("Knight").GetComponent<HeroController>();
+
+        public static GameObject HudCanvas() => GameObject.Find("_GameCameras/HudCamera/Hud Canvas");
     }
 }
