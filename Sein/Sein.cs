@@ -1,4 +1,3 @@
-using CustomKnight;
 using Modding;
 using PurenailCore.ModUtil;
 using System;
