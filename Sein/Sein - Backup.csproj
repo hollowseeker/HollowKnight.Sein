@@ -47,9 +47,6 @@
     <None Remove="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\**\*.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(HollowKnightRefs)/Assembly-CSharp.dll</HintPath>
     </Reference>

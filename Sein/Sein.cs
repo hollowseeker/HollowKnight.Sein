@@ -1,3 +1,4 @@
+using CustomKnight;
 using Modding;
 using PurenailCore.ModUtil;
 using System;
@@ -27,6 +28,12 @@ namespace Sein
             _instance = this;
         }
 
-        public override void Initialize() { }
+        // public static bool OriActive() => SkinManager.GetCurrentSkin().GetId() == "Ori";
+        public static bool OriActive() => true;
+
+        public override void Initialize()
+        {
+            Orb.Hook();
+        }
     }
 }
