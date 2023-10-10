@@ -5,10 +5,7 @@ namespace Sein.Effects
 {
     internal class Regenerate
     {
-        public static void Hook()
-        {
-            SceneHooks.Hook(SetFocusLines);
-        }
+        public static void Hook() => SceneHooks.Hook(SetFocusLines);
 
         private static void SetFocusLines(bool oriEnabled)
         {

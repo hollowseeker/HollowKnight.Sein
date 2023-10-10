@@ -28,12 +28,14 @@ namespace Sein
             _instance = this;
         }
 
-        // public static bool OriActive() => SkinManager.GetCurrentSkin().GetId() == "Ori";
-        public static bool OriActive() => true;
+        public static bool OriActive() => SkinWatcher.OriActive();
 
         public override void Initialize()
         {
+            Hud.Hud.Hook();
             Orb.Hook();
+            Regenerate.Hook();
+            SkinWatcher.Hook();
         }
     }
 }
