@@ -116,6 +116,8 @@ internal class Orb : MonoBehaviour
 
     protected void Update()
     {
+        if (GameManager.instance.isPaused) return;
+
         if (++waited <= WAIT_FRAMES) return;
         if (waited == WAIT_FRAMES + 1)
         {
