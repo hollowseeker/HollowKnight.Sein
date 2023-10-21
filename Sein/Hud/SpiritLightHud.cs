@@ -1,5 +1,4 @@
 ﻿using GlobalEnums;
-using HutongGames.PlayMaker.Actions;
 using ItemChanger.Extensions;
 using Sein.IC;
 using Sein.Util;
@@ -33,9 +32,9 @@ internal class SpiritLightHud : MonoBehaviour
         container = AddSprite("Container", hudSprite.Value, 0);
         light = AddSprite("Light", lightSprite.Value, 1);
 
-        spiritLightText = NewTextMesh("Counter", new(0, 0, -0.01f), Color.black);
-        spiritLightAddText = NewTextMesh("Adder", TEXT_OFFSET, Color.white);
-        spiritLightSubtractText = NewTextMesh("Subtractor", TEXT_OFFSET, Color.red);
+        spiritLightText = CloneTextMesh("Counter", realGeoText, new(0, 0, 0), Color.black);
+        spiritLightAddText = CloneTextMesh("Adder", realGeoAddText, TEXT_OFFSET, Color.white);
+        spiritLightSubtractText = CloneTextMesh("Subtractor", realGeoSubtractText, TEXT_OFFSET, Color.red);
     }
 
     private GameObject AddSprite(string name, Sprite sprite, int sortOrder)
@@ -51,18 +50,20 @@ internal class SpiritLightHud : MonoBehaviour
         return obj;
     }
 
-    private TextMesh NewTextMesh(string name, Vector3 offset, Color color)
+    private TextMesh CloneTextMesh(string name, TextMesh prefab, Vector3 offset, Color color)
     {
-        GameObject obj = new(name);
-        obj.layer = (int)PhysLayers.UI;
+        GameObject obj = Instantiate(prefab.gameObject);
+        foreach (var fsm in obj.GetComponents<PlayMakerFSM>()) Destroy(fsm);
         obj.transform.SetParent(transform);
         obj.transform.localPosition = offset;
 
-        var text = obj.AddComponent<TextMesh>();
+        obj.GetComponent<MeshRenderer>().sortingOrder = 2;
+
+        var text = obj.GetComponent<TextMesh>();
         text.alignment = TextAlignment.Center;
+        text.anchor = TextAnchor.MiddleCenter;
         text.color = color;
         text.fontSize = 24;
-        text.font = realGeoText.font;
 
         return text;
     }
