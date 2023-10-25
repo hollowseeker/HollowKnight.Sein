@@ -1,24 +1,23 @@
 ﻿using ItemChanger;
 
-namespace Sein.Effects
+namespace Sein.Effects;
+
+static class SceneHooks
 {
-    static class SceneHooks
+    public delegate void ConditionalSceneHook(bool oriEnabled);
+    public delegate void SceneHook();
+
+    public static void Hook(ConditionalSceneHook hook)
     {
-        public delegate void ConditionalSceneHook(bool oriEnabled);
-        public delegate void SceneHook();
+        Events.OnSceneChange += _ => hook(SeinMod.OriActive());
+    }
 
-        public static void Hook(ConditionalSceneHook hook)
+    public static void HookWhenEnabled(SceneHook hook)
+    {
+        Events.OnSceneChange += _ =>
         {
-            Events.OnSceneChange += _ => hook(SeinMod.OriActive());
-        }
-
-        public static void HookWhenEnabled(SceneHook hook)
-        {
-            Events.OnSceneChange += _ =>
-            {
-                if (!SeinMod.OriActive()) return;
-                hook();
-            };
-        }
+            if (!SeinMod.OriActive()) return;
+            hook();
+        };
     }
 }

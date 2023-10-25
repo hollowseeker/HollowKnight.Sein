@@ -1,33 +1,32 @@
 ﻿using CustomKnight;
 using UnityEngine;
 
-namespace Sein
+namespace Sein;
+
+// TODO: There should be a hook for this in CustomKnight
+internal class SkinWatcher : MonoBehaviour
 {
-    // TODO: There should be a hook for this in CustomKnight
-    internal class SkinWatcher : MonoBehaviour
+    public delegate void SkinToggled(bool on);
+    public static event SkinToggled? OnSkinToggled;
+
+    public static void Hook()
     {
-        public delegate void SkinToggled(bool on);
-        public static event SkinToggled? OnSkinToggled;
+        var watcher = new GameObject("Skin Watcher");
+        watcher.AddComponent<SkinWatcher>();
+        DontDestroyOnLoad(watcher);
+    }
 
-        public static void Hook()
+    private static bool oriActive = false;
+
+    public static bool OriActive() => oriActive;
+
+    protected void Update()
+    {
+        bool oriActiveNow = SkinManager.GetCurrentSkin().GetId() == "Ori";
+        if (oriActiveNow != oriActive)
         {
-            var watcher = new GameObject("Skin Watcher");
-            watcher.AddComponent<SkinWatcher>();
-            DontDestroyOnLoad(watcher);
-        }
-
-        private static bool oriActive = false;
-
-        public static bool OriActive() => oriActive;
-
-        protected void Update()
-        {
-            bool oriActiveNow = SkinManager.GetCurrentSkin().GetId() == "Ori";
-            if (oriActiveNow != oriActive)
-            {
-                oriActive = oriActiveNow;
-                OnSkinToggled?.Invoke(oriActiveNow);
-            }
+            oriActive = oriActiveNow;
+            OnSkinToggled?.Invoke(oriActiveNow);
         }
     }
 }

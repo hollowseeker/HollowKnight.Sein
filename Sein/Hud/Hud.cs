@@ -5,67 +5,52 @@ using UnityEngine;
 
 namespace Sein.Hud;
 
-internal class Hud : MonoBehaviour
+internal class HudAttacher : PersistentAttacher<HudAttacher, Hud>
 {
-    public static void Hook()
-    {
-        GameObject hud = new("OriHud");
-        hud.AddComponent<Hud>();
-        DontDestroyOnLoad(hud);
-    }
+    protected override GameObject? FindParent() => GOFinder.HudCanvas();
+}
 
+internal class Hud : PersistentMonoBehaviour
+{
     private static Vector3 LIVE_OFFSET = new(0, 6.1f, 0);
     private static Vector3 HIDE_OFFSET = new(-100, 0, 0);
-    private GameObject realHud;
     private List<GameObject> origChildren;
+    private GameObject oriHud;
 
-    protected bool Init()
+    protected void Awake()
     {
-        if (realHud != null) return true;
-        realHud = GOFinder.HudCanvas();
-        if (realHud == null) return false;
+        origChildren = gameObject.AllChildren().ToList();
 
-        origChildren = realHud.AllChildren().ToList();
-
-        transform.SetParent(realHud.transform.parent);
-        transform.position = LIVE_OFFSET + HIDE_OFFSET;
-        gameObject.layer = realHud.layer;
+        oriHud = new("OriHud");
+        oriHud.transform.SetParent(gameObject.transform.parent);
+        oriHud.transform.position = LIVE_OFFSET + HIDE_OFFSET;
+        oriHud.layer = gameObject.layer;
 
         SkinWatcher.OnSkinToggled += UpdateState;
 
         // Local position center
         GameObject spiritLightHud = new("SpiritLightHud");
-        spiritLightHud.transform.SetParent(transform);
+        spiritLightHud.transform.SetParent(oriHud.transform);
         spiritLightHud.transform.localPosition = Vector3.zero;
         spiritLightHud.AddComponent<SpiritLightHud>();
-
-        // TODO: Init other children
-
-        return true;
     }
 
-    private bool isOriAndHudActive = false;
+    private bool isOriActive = false;
 
     private void UpdateState(bool oriActive)
     {
         var hudX = origChildren[0].transform.position.x;
         Vector3 offset = Vector3.zero;
-        if (oriActive && hudX > -50)
-            offset = HIDE_OFFSET;
-        else if (!oriActive && hudX < -50)
-            offset = -HIDE_OFFSET;
+        if (oriActive && hudX > -50) offset = HIDE_OFFSET;
+        else if (!oriActive && hudX < -50) offset = -HIDE_OFFSET;
         foreach (var go in origChildren) go.transform.localPosition += offset;
 
-        if ((oriActive && realHud.activeSelf) != isOriAndHudActive)
+        if (oriActive != isOriActive)
         {
-            isOriAndHudActive = oriActive && realHud.activeSelf;
-            transform.localPosition += isOriAndHudActive ? -HIDE_OFFSET : HIDE_OFFSET;
+            isOriActive = oriActive;
+            transform.localPosition += isOriActive ? -HIDE_OFFSET : HIDE_OFFSET;
         }
     }
 
-    protected void Update()
-    {
-        if (!Init()) return;
-        UpdateState(SkinWatcher.OriActive());
-    }
+    protected void Update() => UpdateState(SkinWatcher.OriActive());
 }
