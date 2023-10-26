@@ -92,7 +92,7 @@ internal class HeroAnimationOverrider : PersistentMonoBehaviour
         if (overrideState == null || overrideState.clipName != clipName)
         {
             overrideState = null;
-            if (animTemplates.TryGetValue(clipName, out var template))
+            if (SeinMod.OriActive() && animTemplates.TryGetValue(clipName, out var template))
             {
                 overrideState = new()
                 {
