@@ -22,7 +22,7 @@ internal class Hud : PersistentMonoBehaviour
         origChildren = gameObject.AllChildren().ToList();
 
         oriHud = new("OriHud");
-        oriHud.transform.SetParent(gameObject.transform.parent);
+        oriHud.transform.SetParent(transform);
         oriHud.transform.position = LIVE_OFFSET + HIDE_OFFSET;
         oriHud.layer = gameObject.layer;
 
