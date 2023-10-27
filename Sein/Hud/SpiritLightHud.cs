@@ -35,7 +35,7 @@ internal class SpiritLightHud : MonoBehaviour
         spriteContainer = new("SpriteContainer");
         spriteContainer.transform.SetParent(transform);
         spriteContainer.transform.localPosition = Vector3.zero;
-        spriteContainer.transform.localScale = new(0.26f, 0.26f, 0);
+        spriteContainer.transform.localScale = new(0.71f, 0.71f, 0);
         container = AddSprite("Container", hudSprite.Value, 0);
         light = AddSprite("Light", lightSprite.Value, 1);
 
@@ -61,7 +61,7 @@ internal class SpiritLightHud : MonoBehaviour
         if (counter <= 1) return 0.1f;
 
         float log = Mathf.Log(counter) / Mathf.Log(MAX_GEO);
-        float p = log * log;
+        float p = Mathf.Pow(log, 0.75f);
         return MIN_SCALE + p * (1 - MIN_SCALE);
     }
 
@@ -87,6 +87,7 @@ internal class SpiritLightHud : MonoBehaviour
         renderer.sortingLayerName = "Over";
         renderer.sortingOrder = sortOrder;
         obj.transform.SetParent(spriteContainer.transform);
+        obj.transform.localScale = new(1, 1, 1);
         obj.transform.localPosition = Vector3.zero;
         return obj;
     }
