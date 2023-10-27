@@ -108,17 +108,20 @@ internal class HeroAnimationOverrider : PersistentMonoBehaviour
         orig_fn();
     }
 
+    // Approximate renderer control.
+    private bool RendererAvailable() => !heroController.cState.hazardDeath && !heroController.cState.dead;
+
     private void UpdateImpl(float time)
     {
         if (overrideState == null)
         {
-            if (!renderer.enabled) renderer.enabled = true;
-            if (spriteOverrideRenderer.enabled) spriteOverrideRenderer.enabled = false;
+            renderer.enabled = RendererAvailable();
+            spriteOverrideRenderer.enabled = false;
             return;
         }
 
-        if (renderer.enabled) renderer.enabled = false;
-        if (!spriteOverrideRenderer.enabled) spriteOverrideRenderer.enabled = true;
+        renderer.enabled = false;
+        spriteOverrideRenderer.enabled = RendererAvailable();
         overrideState.template.UpdateState(ref overrideState.state, time);
         overrideState.template.ApplyState(heroController.cState, overrideState.state, spriteOverrideRenderer);
     }
