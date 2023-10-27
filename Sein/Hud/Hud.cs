@@ -14,43 +14,75 @@ internal class Hud : PersistentMonoBehaviour
 {
     private static Vector3 LIVE_OFFSET = new(0, 6.1f, 0);
     private static Vector3 HIDE_OFFSET = new(-100, 0, 0);
+    private static Vector3 SLIDE_OUT_OFFSET = new(0, 3f, 0);
+
     private List<GameObject> origChildren;
+    private PlayMakerFSM slideOutFsm;
     private GameObject oriHud;
+
+    private static float SLIDE_DURATION = 0.8f;
+    private float outFraction = 1;
 
     protected void Awake()
     {
         origChildren = gameObject.AllChildren().ToList();
+        slideOutFsm = gameObject.LocateMyFSM("Slide Out");
 
         oriHud = new("OriHud");
-        oriHud.transform.SetParent(transform);
-        oriHud.transform.position = LIVE_OFFSET + HIDE_OFFSET;
+        DontDestroyOnLoad(oriHud);
+        oriHud.transform.position = LIVE_OFFSET + HIDE_OFFSET + SLIDE_OUT_OFFSET;
         oriHud.layer = gameObject.layer;
 
-        SkinWatcher.OnSkinToggled += UpdateState;
+        UpdateOriState(SkinWatcher.OriActive());
+        SkinWatcher.OnSkinToggled += UpdateOriState;
 
         // Local position center
         GameObject spiritLightHud = new("SpiritLightHud");
         spiritLightHud.transform.SetParent(oriHud.transform);
         spiritLightHud.transform.localPosition = Vector3.zero;
+        spiritLightHud.transform.localScale = new(0.7f, 0.7f, 1);
         spiritLightHud.AddComponent<SpiritLightHud>();
+    }
+
+    protected void OnDestroy()
+    {
+        Destroy(oriHud);
     }
 
     private bool isOriActive = false;
 
-    private void UpdateState(bool oriActive)
+    private void UpdateOriState(bool oriActive)
     {
-        var hudX = origChildren[0].transform.position.x;
-        Vector3 offset = Vector3.zero;
-        if (oriActive && hudX > -50) offset = HIDE_OFFSET;
-        else if (!oriActive && hudX < -50) offset = -HIDE_OFFSET;
-        foreach (var go in origChildren) go.transform.localPosition += offset;
+        if (isOriActive == oriActive) return;
 
-        if (oriActive != isOriActive)
-        {
-            isOriActive = oriActive;
-            transform.localPosition += isOriActive ? -HIDE_OFFSET : HIDE_OFFSET;
-        }
+        isOriActive = oriActive;
+        foreach (var go in origChildren) go.transform.localPosition += isOriActive ? HIDE_OFFSET : -HIDE_OFFSET;
+        oriHud.transform.localPosition += isOriActive ? -HIDE_OFFSET : HIDE_OFFSET;
     }
 
-    protected void Update() => UpdateState(SkinWatcher.OriActive());
+    private bool IsIn()
+    {
+        var state = slideOutFsm.ActiveStateName;
+        return state == "Idle" || state == "In" || state == "Come In";
+    }
+
+    private Vector3 GetOutOffset() => SLIDE_OUT_OFFSET * Mathf.Sqrt(outFraction);
+
+    protected void Update()
+    {
+        var isIn = IsIn();
+        var oldOffset = GetOutOffset();
+        if (isIn && outFraction > 0)
+        {
+            outFraction -= Time.deltaTime / SLIDE_DURATION;
+            if (outFraction < 0) outFraction = 0;
+        }
+        else if (!isIn && outFraction < 1)
+        {
+            outFraction += Time.deltaTime / SLIDE_DURATION;
+            if (outFraction > 1) outFraction = 1;
+        }
+        var newOffset = GetOutOffset();
+        oriHud.transform.localPosition += newOffset - oldOffset;
+    }
 }

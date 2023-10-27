@@ -2,6 +2,7 @@
 using ItemChanger.Extensions;
 using Sein.IC;
 using Sein.Util;
+using System.Reflection;
 using UnityEngine;
 
 namespace Sein.Hud;
@@ -10,8 +11,8 @@ internal class SpiritLightHud : MonoBehaviour
 {
     private static readonly EmbeddedSprite hudSprite = new("SpiritLightHud");
     private static readonly EmbeddedSprite lightSprite = new("SpiritLightOrb");
-    private static readonly Vector3 TEXT_OFFSET = new(0, -0.5f, -0.01f);
 
+    private GeoCounter geoCounter;
     private TextMesh realGeoText;
     private TextMesh realGeoAddText;
     private TextMesh realGeoSubtractText;
@@ -24,17 +25,52 @@ internal class SpiritLightHud : MonoBehaviour
 
     protected void Awake()
     {
-        var geoCounter = GOFinder.HudCanvas().FindChild("Geo Counter");
-        realGeoText = geoCounter.FindChild("Geo Text").GetComponent<TextMesh>();
-        realGeoAddText = geoCounter.FindChild("Add Text").GetComponent<TextMesh>();
-        realGeoSubtractText = geoCounter.FindChild("Subtract Text").GetComponent<TextMesh>();
+        var geoCounterObj = GOFinder.HudCanvas().FindChild("Geo Counter");
+        geoCounter = geoCounterObj.GetComponent<GeoCounter>();
+        realGeoText = geoCounterObj.FindChild("Geo Text").GetComponent<TextMesh>();
+        realGeoAddText = geoCounterObj.FindChild("Add Text").GetComponent<TextMesh>();
+        realGeoSubtractText = geoCounterObj.FindChild("Subtract Text").GetComponent<TextMesh>();
 
         container = AddSprite("Container", hudSprite.Value, 0);
         light = AddSprite("Light", lightSprite.Value, 1);
 
-        spiritLightText = CloneTextMesh("Counter", realGeoText, new(0, 0, 0), Color.black);
-        spiritLightAddText = CloneTextMesh("Adder", realGeoAddText, TEXT_OFFSET, Color.white);
-        spiritLightSubtractText = CloneTextMesh("Subtractor", realGeoSubtractText, TEXT_OFFSET, Color.red);
+        spiritLightText = CloneTextMesh("Counter", realGeoText, new(0, -3, 0), Color.black);
+        spiritLightAddText = CloneTextMesh("Adder", realGeoAddText, new(0, -4, 0), Color.white);
+        spiritLightSubtractText = CloneTextMesh("Subtractor", realGeoSubtractText, new(0, -4, 0), Color.red);
+
+        On.GeoCounter.Update += UpdateGeoCounterOverride;
+    }
+
+    protected void OnDestroy()
+    {
+        On.GeoCounter.Update -= UpdateGeoCounterOverride;
+    }
+
+    private const int MAX_GEO = 20000;
+    private static float MIN_SCALE = 0.1f;
+    private static float ROT_SPEED = 30;
+
+    private float GetGeoScale(int counter)
+    {
+        if (counter >= MAX_GEO) return 1;
+        if (counter <= 1) return 0.1f;
+
+        float log = Mathf.Log(counter) / Mathf.Log(MAX_GEO);
+        float p = log * log;
+        return MIN_SCALE + p * (1 - MIN_SCALE);
+    }
+
+    private void UpdateGeoCounter()
+    {
+        var currentGeo = (int)geoFieldInfo.GetValue(geoCounter);
+        float scale = GetGeoScale(currentGeo);
+        light.transform.localScale = new(scale, scale, 1);
+    }
+
+    private void UpdateGeoCounterOverride(On.GeoCounter.orig_Update orig, GeoCounter self)
+    {
+        UpdateGeoCounter();
+        orig(self);
     }
 
     private GameObject AddSprite(string name, Sprite sprite, int sortOrder)
@@ -68,21 +104,10 @@ internal class SpiritLightHud : MonoBehaviour
         return text;
     }
 
-    private const int MAX_GEO = 20000;
-    private static float MIN_SCALE = 0.1f;
-    private static float ROT_SPEED = 30;
-
-    private float GetGeoScale(int counter)
-    {
-        if (counter >= MAX_GEO) return 1;
-        if (counter <= 1) return 0.1f;
-
-        float log = Mathf.Log(counter) / Mathf.Log(MAX_GEO);
-        float p = log * log;
-        return MIN_SCALE + p * (1 - MIN_SCALE);
-    }
-
     private float angle = 0;
+
+    private static readonly FieldInfo geoFieldInfo = typeof(GeoCounter).GetField("counterCurrent", BindingFlags.NonPublic | BindingFlags.Instance);
+    private int currentGeo;
 
     protected void Update()
     {
@@ -90,14 +115,7 @@ internal class SpiritLightHud : MonoBehaviour
         spiritLightAddText.text = realGeoAddText.text;
         spiritLightSubtractText.text = realGeoSubtractText.text;
 
-        if (int.TryParse(spiritLightText.text, out int counter))
-        {
-            float scale = GetGeoScale(counter);
-            light.transform.localScale = new(scale, scale, 1);
-        }
-        else light.transform.localScale = new(MIN_SCALE, MIN_SCALE, 1);
-
-        angle += ROT_SPEED * Time.deltaTime;
+        angle = (angle + ROT_SPEED * Time.deltaTime) % 360;
         light.transform.localRotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 }
