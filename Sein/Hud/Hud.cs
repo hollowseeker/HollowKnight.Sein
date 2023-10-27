@@ -12,9 +12,9 @@ internal class HudAttacher : PersistentAttacher<HudAttacher, Hud>
 
 internal class Hud : PersistentMonoBehaviour
 {
-    private static Vector3 LIVE_OFFSET = new(0, 6.1f, 0);
+    private static Vector3 LIVE_OFFSET = new(0, 6.75f, 0);
     private static Vector3 HIDE_OFFSET = new(-100, 0, 0);
-    private static Vector3 SLIDE_OUT_OFFSET = new(0, 3f, 0);
+    private static Vector3 SLIDE_OUT_OFFSET = new(0, 3.5f, 0);
 
     private List<GameObject> origChildren;
     private PlayMakerFSM slideOutFsm;
@@ -40,7 +40,6 @@ internal class Hud : PersistentMonoBehaviour
         GameObject spiritLightHud = new("SpiritLightHud");
         spiritLightHud.transform.SetParent(oriHud.transform);
         spiritLightHud.transform.localPosition = Vector3.zero;
-        spiritLightHud.transform.localScale = new(0.7f, 0.7f, 1);
         spiritLightHud.AddComponent<SpiritLightHud>();
     }
 

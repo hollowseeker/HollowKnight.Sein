@@ -17,6 +17,7 @@ internal class SpiritLightHud : MonoBehaviour
     private TextMesh realGeoAddText;
     private TextMesh realGeoSubtractText;
 
+    private GameObject spriteContainer;
     private GameObject container;
     private GameObject light;
     private TextMesh spiritLightText;
@@ -31,12 +32,16 @@ internal class SpiritLightHud : MonoBehaviour
         realGeoAddText = geoCounterObj.FindChild("Add Text").GetComponent<TextMesh>();
         realGeoSubtractText = geoCounterObj.FindChild("Subtract Text").GetComponent<TextMesh>();
 
+        spriteContainer = new("SpriteContainer");
+        spriteContainer.transform.SetParent(transform);
+        spriteContainer.transform.localPosition = Vector3.zero;
+        spriteContainer.transform.localScale = new(0.26f, 0.26f, 0);
         container = AddSprite("Container", hudSprite.Value, 0);
         light = AddSprite("Light", lightSprite.Value, 1);
 
-        spiritLightText = CloneTextMesh("Counter", realGeoText, new(0, -3, 0), Color.black);
-        spiritLightAddText = CloneTextMesh("Adder", realGeoAddText, new(0, -4, 0), Color.white);
-        spiritLightSubtractText = CloneTextMesh("Subtractor", realGeoSubtractText, new(0, -4, 0), Color.red);
+        spiritLightText = CloneTextMesh("Counter", realGeoText, new(0, -2.1f, 0));
+        spiritLightAddText = CloneTextMesh("Adder", realGeoAddText, new(0, -2.8f, 0));
+        spiritLightSubtractText = CloneTextMesh("Subtractor", realGeoSubtractText, new(0, -2.8f, 0));
 
         On.GeoCounter.Update += UpdateGeoCounterOverride;
     }
@@ -81,12 +86,12 @@ internal class SpiritLightHud : MonoBehaviour
         renderer.sprite = sprite;
         renderer.sortingLayerName = "Over";
         renderer.sortingOrder = sortOrder;
-        obj.transform.SetParent(transform);
+        obj.transform.SetParent(spriteContainer.transform);
         obj.transform.localPosition = Vector3.zero;
         return obj;
     }
 
-    private TextMesh CloneTextMesh(string name, TextMesh prefab, Vector3 offset, Color color)
+    private TextMesh CloneTextMesh(string name, TextMesh prefab, Vector3 offset)
     {
         GameObject obj = Instantiate(prefab.gameObject);
         foreach (var fsm in obj.GetComponents<PlayMakerFSM>()) Destroy(fsm);
@@ -98,8 +103,7 @@ internal class SpiritLightHud : MonoBehaviour
         var text = obj.GetComponent<TextMesh>();
         text.alignment = TextAlignment.Center;
         text.anchor = TextAnchor.MiddleCenter;
-        text.color = color;
-        text.fontSize = 24;
+        text.fontSize = 36;
 
         return text;
     }
